@@ -1,0 +1,22 @@
+{
+  "name": "html5demo",
+  "version": "1.0.0",
+  "description": "about html5",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZhouYanlang/HTML5.git"
+  },
+  "keywords": [
+    "html5"
+  ],
+  "author": "itattoo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ZhouYanlang/HTML5/issues"
+  },
+  "homepage": "https://github.com/ZhouYanlang/HTML5#readme"
+}
