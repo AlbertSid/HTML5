@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+
+	<body>
+		<!--<script src="storage.js" type="text/javascript" charset="utf-8"></script>-->
+		<script src="localStorage.js" type="text/javascript" charset="utf-8"></script>
+		<!--<script type="text/javascript" src="//cdn.jsdelivr.net/localstorage/2.0.1/localStorage.min.js?swfURL=//cdn.jsdelivr.net/localstorage/2.0.1/localStorage.swf"></script>-->
+		<script type="text/javascript">
+			console.log(window)
+			
+
+			console.group("Fun")
+			console.log('GlobalStorage', window.GlobalStorage)
+			console.log('UserDataStorage', window.UserDataStorage)
+			console.log('FlashStorage', window.FlashStorage)
+			console.log('CookieStorage', window.CookieStorage)
+			console.groupEnd()
+
+			console.group('API')
+			console.log('Storage API', window.Storage.prototype)
+			console.log('GlobalStorage API', window.GlobalStorage.prototype)
+			console.log('UserDataStorage API', window.UserDataStorage.prototype)
+			console.log('FlashStorage API', window.FlashStorage.prototype)
+			console.log('CookieStorage API', window.CookieStorage.prototype)
+			console.groupEnd()
+
+			console.group('TYPE')
+			console.log(localStorage instanceof Storage)
+			console.log(localStorage instanceof GlobalStorage)//针对火狐
+			console.log(localStorage instanceof UserDataStorage)//针对低版本IE
+			console.log(localStorage instanceof FlashStorage)//对与使用Flash
+			console.log(localStorage instanceof CookieStorage)//对于使用Cookie
+			console.groupEnd()
+			
+			var regexp_quota = /quota/i;
+			try {
+				window.localStorage.setItem('COKEY', 'nddsf');
+			} catch(exc) {
+				if(regexp_quota.test(exc.name) || regexp_quota.test(exc.message) || exc.name === "Error") {
+					console.error("The localStorage is full");
+				}
+			}
+			console.info(localStorage.getItem('COKEY'))
+			
+			CookieStorage.prototype.setItem('name','1111')
+			console.info(CookieStorage.prototype.getItem('name'))
+			
+			console.log('localStorage', window.localStorage)
+			console.info(Storage.length)
+		</script>
+		<!--<script src="localForage.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			console.log(localforage)
+
+			localforage.setDriver(localforage.INDEXEDDB);
+			//			localforage.setDriver(localforage.LOCALSTORAGE);
+			//			localforage.config({
+			//				driver: localforage.WEBSQL
+			//			});
+			localforage.setItem('my array', [11, 2, 'three']).then(function(value) {
+				console.log('setItem', value[0]);
+			}).catch(function(err) {
+				console.log(err);
+			});
+
+			localforage.setItem('key', '1').then(function(value) {
+				console.log('setItem', value);
+			})
+			localforage.getItem('key').then(function(value) {
+
+				console.log('getItem', value);
+			}).catch(function(err) {
+				console.log(err);
+			});
+
+			//			localforage.removeItem('key').then(function() {
+			//				console.log('Key is cleared!');
+			//			}).catch(function(err) {
+			//				console.log(err);
+			//			});
+			//			localforage.clear().then(function() {
+			//				console.log('Database is now empty.');
+			//			}).catch(function(err) {
+			//				console.log(err);
+			//			});
+			//			localforage.length().then(function(numberOfKeys) {
+			//				// Outputs the length of the database.
+			//				console.log(numberOfKeys);
+			//			}).catch(function(err) {
+			//				// This code runs if there were any errors
+			//				console.log(err);
+			//			});
+			//			localforage.key(2).then(function(keyName) {
+			//				// Name of the key.
+			//				console.log(keyName);
+			//			}).catch(function(err) {
+			//				// This code runs if there were any errors
+			//				console.log(err);
+			//			});
+			//			localforage.keys().then(function(keys) {
+			//				// An array of all the key names.
+			//				console.log(keys);
+			//			}).catch(function(err) {
+			//				// This code runs if there were any errors
+			//				console.log(err);
+			//			});
+			//			// The same code, but using ES6 Promises.
+			//			localforage.iterate(function(value, key, iterationNumber) {
+			//				// Resulting key/value pair -- this callback
+			//				// will be executed for every item in the
+			//				// database.
+			//				console.log([key, value]);
+			//			}).then(function() {
+			//				console.log('Iteration has completed');
+			//			}).catch(function(err) {
+			//				// This code runs if there were any errors
+			//				console.log(err);
+			//			});
+			//
+			//			// Exit the iteration early:
+			//			localforage.iterate(function(value, key, iterationNumber) {
+			//				if(iterationNumber < 3) {
+			//					console.log([key, value]);
+			//				} else {
+			//					return [key, value];
+			//				}
+			//			}).then(function(result) {
+			//				console.log('Iteration has completed, last iterated pair:');
+			//				console.log(result);
+			//			}).catch(function(err) {
+			//				// This code runs if there were any errors
+			//				console.log(err);
+			//			});
+		</script>-->
+
+	</body>
+
+</html>

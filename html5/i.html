@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			body {
+				padding: 100px 0 0 100px;
+			}
+			
+			#box {
+				display: inline-block;
+				height: 300px;
+				width: 300px;
+				transform: rotate(45deg);
+			}
+			
+			.box-transform {
+				border: 6px solid #fff;
+				float: left;
+				height: 100%;
+				width: 100%;
+				position: relative;
+				background-color: indianred;
+			}
+			
+			.box-transform:before {
+				content: "";
+				position: absolute;
+				height: 100%;
+				width: 100%;
+				border: 6px solid #fff;
+				background-color: rgba(0, 0, 0, .3);
+				z-index: -1;
+				left: 27px;
+				top: -27px;
+			}
+			
+			.box-transform:after {
+				content: "";
+				height: 100%;
+				width: 100%;
+				border: 6px solid #fff;
+				background-color: rgba(0, 0, 0, .3);
+				position: absolute;
+				z-index: -1;
+				left: -27px;
+				top: 27px;
+			}
+			
+			.box-transform>div {
+				display: flex;
+				height: 100%;
+				width: 100%;
+				transform: rotate(-45deg);
+				transform-style: flat;
+				justify-content: center;
+				align-items: center;
+			}
+		</style>
+
+	</head>
+	<body style="padding:100px 0 0 100px;">
+		<div id="box">
+			<div class="box-transform">
+				<div>
+					<p>name</p>
+					<p>2016-09-09</p>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>

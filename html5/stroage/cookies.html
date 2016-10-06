@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>Cookies+UserData</title>
+	</head>
+
+	<body>
+		<script type="text/javascript">
+			var sel = new Object();
+			var sel_num = 0;
+
+			function getCookieVal(offset) {
+				var endstr = document.cookie.indexOf(";", offset);
+				if(endstr == -1) endstr = document.cookie.length;
+				return unescape(document.cookie.substring(offset, endstr));
+			}
+
+			function GetCookie(name) {
+				var arg = name + "=";
+				var alen = arg.length;
+				var clen = document.cookie.length;
+				//alert(document.cookie.length); 
+				var i = 0;
+				while(i < clen) {
+					var j = i + alen;
+					if(document.cookie.substring(i, j) == arg)
+						return getCookieVal(j);
+					i = document.cookie.indexOf(" ", i) + 1;
+					if(i == 0) break;
+				}
+				return null;
+			}
+
+			function SetCookie(name, value, expires, path, domain, secure) {
+				document.cookie = name + "=" + escape(value) + ((expires) ? "; expires=" + expires.toGMTString() : "") + ((path) ? "; path=" + path : "") + ((domain) ? "; domain=" + domain : "") + ((secure) ? "; secure" : "");
+				return value;
+			}
+
+			function DeleteCookie(name) {
+				if(GetCookie(name) != null) {
+					SetCookie(name, "", null, "/", null);
+				}
+			}
+
+			function cookie_content() {
+				i = 0;
+				var content = "";
+				for(key in sel) {
+					if(i == 0) {
+						content += key + "[" + sel[key] + "]";
+					} else {
+						content += "," + key + "[" + sel[key] + "]";
+					}
+					i++;
+				}
+				return content;
+			}
+
+			function inni_data() {
+				var cookie_sel = new Object();
+				cookie_str = GetCookie("Member_COOKIE");
+				if(cookie_str != "" && cookie_str != null) {
+					cookie_sel = cookie_str.split(',');
+					for(var k = 0; k < cookie_sel.length; k++) {
+						i = cookie_sel[k].indexOf("[");
+						j = cookie_sel[k].indexOf("]");
+						sel[cookie_sel[k].substring(0, i)] = cookie_sel[k].substring(i + 1, j);
+						sel_num++;
+					}
+					draw();
+				}
+			}
+
+			function addMember(id, nm) {
+				if(!sel[id]) {
+					sel_num++;
+					sel[id] = nm;
+				} else {
+					sel[id] = nm;
+				}
+				SetCookie("Member_COOKIE", cookie_content(), null, "/", null);
+			}
+
+			function draw() {
+				out = '';
+				for(key in sel) {
+					$("#" + key).val(sel[key]);
+				}
+			}
+		</script>
+		<!--<script src="cookies.js"></script>-->
+		<script>
+			console.group('JS API')
+			console.log('encodeURIComponent', encodeURIComponent('I TATTOO'))
+			console.log('decodeURIComponent', decodeURIComponent(encodeURIComponent('I TATTOO')))
+
+			console.log('encodeURI', encodeURI('I TATTOO'))
+			console.log('decodeURI', decodeURI(encodeURI('I TATTOO')))
+
+			console.log('escape', escape('I TATTOO'))
+			console.log('unescape', unescape(escape('I TATTOO')))
+			console.groupEnd()
+
+			var Cookies = function() {
+				this.defaults = {
+					//						expires: 'number',
+					//						path: 'string',
+					//						domain: 'boolean',
+					//						secure: 'boolean'
+				};
+				this.extend = function() {
+					var result = {};
+					for(var i = 0; i < arguments.length; i++) {
+						var value = arguments[i];
+						for(var key in value) {
+							result[key] = value[key];
+						}
+					}
+					return result;
+				};
+				this.keys = function() {
+					if(!document.cookie) {
+						return null;
+					}
+					var arr = document.cookie.split(';');
+					var k = [];
+					for(var i = 0, len = arr.length; i < len; i++) {
+						k.push(arr[i].trim().split('=')[0])
+					}
+					return k.sort();
+				};
+				this.values = function() {
+					if(!document.cookie) {
+						return null;
+					}
+					var arr = document.cookie.split(';');
+					var k = [];
+					for(var i = 0, len = arr.length; i < len; i++) {
+						k.push(arr[i].trim().split('=')[1])
+					}
+					return k.sort();
+				};
+			}
+			Cookies.prototype = {
+				constructor: Cookies,
+				setItem: function(key, value, options) { //设置Cookies
+					var that = new(this.constructor)();
+					//console.log(options)
+					var options = that.extend({
+						path: '/'
+					}, that.defaults, options);
+					if(typeof options.expires === 'number') {
+						var exp = new Date();
+						exp.setMilliseconds(exp.getMilliseconds() + options.expires * 864e+5);
+						options.expires = exp;
+					}
+					try {
+						result = JSON.stringify(value);
+						if(/^[\{\[]/.test(result)) {
+							value = result;
+						}
+					} catch(e) {
+						console.error(e)
+					}
+					key = encodeURIComponent(String(key));
+					key = key.replace(/%(23|24|26|2B|5E|60|7C)/g, decodeURIComponent);
+					key = key.replace(/[\(\)]/g, escape);
+					if(!JSON.stringify) {
+						var name = String(key);
+					} else {
+						var name = JSON.stringify(key);
+					}
+					
+					document.cookie = [
+						name, '=', escape(value),//.toGMTString()
+						options.expires ? '; expires=' + options.expires.toUTCString() : '',
+						options.path ? '; path=' + options.path : '',
+						options.domain ? '; domain=' + options.domain : '',
+						options.secure ? '; secure' : ''
+					].join('')
+					console.log(options)
+					console.log(document.cookie)
+				},
+				getItem: function(key) { //取key的值
+					if(!document.cookie) {
+						return null;
+					}
+					if(!JSON.stringify) {
+						var name = key;
+					} else {
+						var name = JSON.stringify(key);
+					}
+					var arr = document.cookie.match(new RegExp("(^| )" + name + "=([^;]*)(;|$)"));
+					if(arr != null) {
+						return unescape(arr[2]);
+					} else {
+						console.error(key + ' is undefined')
+					}
+				},
+				removeItem: function(key, options) { //移除记录
+					var that = new(this.constructor)();
+					if(!JSON.stringify) {
+						var name = String(key);
+					} else {
+						var name = JSON.stringify(key);
+					}
+					this.setItem(name, '', that.extend(options, {
+						expires: -1
+					}));
+				},
+				key: function(number) { //取第number个所对应的key
+					if(!document.cookie) {
+						return null;
+					}
+					var that = new(this.constructor)();
+					return that.keys()[number];
+				},
+				clear: function() { //清除记录
+					var that = new(this.constructor)();
+					var arr = document.cookie.split(';');
+					for(var i = 0, len = arr.length; i < len; i++) {
+						if(!JSON.stringify) {
+							var name = String(arr[i].trim().split('=')[0]);
+						} else {
+							var name = JSON.stringify(arr[i].trim().split('=')[0]);
+						}
+						this.setItem(name, '', that.extend({
+							expires: -1
+						}));
+					}
+				}
+			};
+			Cookies = Cookies.prototype;
+			//console.log('Cookies', Cookies);
+		</script>
+		<script>
+			var UserData = {
+				userData: null,
+				name: location.hostname,
+				init: function() {
+					if(!UserData.userData) {
+						try {
+							UserData.userData = document.createElement('input');
+							UserData.userData.type = 'hidden';
+							UserData.userData.style.display = 'none';
+							UserData.userData.addBehavior('#default#userData');
+							document.body.appendChild(UserData.userData);
+							var expires = new Date();
+							expires.setDate(expires.getDate() + 365);
+							UserData.userData.expires = expires.toUTCString();
+						} catch(e) {
+							return false;
+						}
+					}
+					return true;
+				},
+				setItem: function(key, value) {
+					if(UserData.init()) {
+						UserData.userData.load(UserData.name);
+						UserData.userData.setAttribute(key, value);
+						UserData.userData.save(UserData.name);
+					}
+				},
+				getItem: function(key) {
+					if(UserData.init()) {
+						UserData.userData.load(UserData.name);
+						return UserData.userData.getAttribute(key)
+					}
+				},
+				remove: function(key) {
+					if(UserData.init()) {
+						UserData.userData.load(UserData.name);
+						UserData.userData.removeAttribute(key);
+						UserData.userData.save(UserData.name);
+					}
+				}
+			};
+		</script>
+	</body>
+
+</html>
