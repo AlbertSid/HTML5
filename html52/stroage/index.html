@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+
+	<body>
+		<!--<script src="storage.js" type="text/javascript" charset="utf-8"></script>-->
+		<!--<script src="localStorage.js" type="text/javascript" charset="utf-8"></script>-->
+		<!--<script type="text/javascript" src="//cdn.jsdelivr.net/localstorage/2.0.1/localStorage.min.js?swfURL=//cdn.jsdelivr.net/localstorage/2.0.1/localStorage.swf"></script>-->
+		<!--<script type="text/javascript">
+			console.log(window)
+			
+
+			console.group("Fun")
+			console.log('GlobalStorage', window.GlobalStorage)
+			console.log('UserDataStorage', window.UserDataStorage)
+			console.log('FlashStorage', window.FlashStorage)
+			console.log('CookieStorage', window.CookieStorage)
+			console.groupEnd()
+
+			console.group('API')
+			console.log('Storage API', window.Storage.prototype)
+			console.log('GlobalStorage API', window.GlobalStorage.prototype)
+			console.log('UserDataStorage API', window.UserDataStorage.prototype)
+			console.log('FlashStorage API', window.FlashStorage.prototype)
+			console.log('CookieStorage API', window.CookieStorage.prototype)
+			console.groupEnd()
+
+			console.group('TYPE')
+			console.log(localStorage instanceof Storage)
+			console.log(localStorage instanceof GlobalStorage)//针对火狐
+			console.log(localStorage instanceof UserDataStorage)//针对低版本IE
+			console.log(localStorage instanceof FlashStorage)//对与使用Flash
+			console.log(localStorage instanceof CookieStorage)//对于使用Cookie
+			console.groupEnd()
+			
+			var regexp_quota = /quota/i;
+			try {
+				window.localStorage.setItem('COKEY', 'nddsf');
+			} catch(exc) {
+				if(regexp_quota.test(exc.name) || regexp_quota.test(exc.message) || exc.name === "Error") {
+					console.error("The localStorage is full");
+				}
+			}
+			console.info(localStorage.getItem('COKEY'))
+			
+			CookieStorage.prototype.setItem('name','1111')
+			console.info(CookieStorage.prototype.getItem('name'))
+			
+			console.log('localStorage', window.localStorage)
+			console.info(Storage.length)
+		</script>-->
+
+		<script src="localForage.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			console.log(localforage)
+
+			localforage.config({
+				driver: localforage.WEBSQL,
+				name: 'WEBSQL PDA App'
+			});
+			//			localforage.config({
+			//				driver: localforage.INDEXEDDB,
+			//				name: 'INDEXEDDB PDA App'
+			//			});
+			//			localforage.config({
+			//				driver: localforage.LOCALSTORAGE,
+			//				//name: 'LOCALSTORAGE PDA App'
+			//			});
+			localforage.setItem('my array', [11, 2, 'three']).then(function(value) {
+				//console.log('setItem', value[0]);
+			}).catch(function(err) {
+				//console.log(err);
+			});
+
+			localforage.setItem('key', '1').then(function(value) {
+				//console.log('setItem', value);
+			});
+			localforage.setImage = function(key, url) {
+				var img = document.createElement('img');
+				img.addEventListener("load", function() {
+					var imgCanvas = document.createElement("canvas");
+					imgCanvas.width = this.width;
+					imgCanvas.height = this.height;
+
+					var imgContext = imgCanvas.getContext("2d");
+					imgContext.drawImage(this, 0, 0, this.width, this.height);
+
+					var date = new Date();
+					var storageFiles = {};
+					storageFiles.url = imgCanvas.toDataURL("image/png");
+					storageFiles.date = (date.getMonth() + 1).toString() + date.getDate().toString();
+					try {
+						localforage.setItem(key, JSON.stringify(storageFiles)).then(function(value) {
+							//console.log(key, value);
+						});
+					} catch(e) {
+						console.log("Storage failed: " + e);
+					}
+				}, false);
+				img.setAttribute("src", url);
+			}
+			localforage.setImage('imgUrl', 'http://127.0.0.1:8020/tattoo-in-demo/html5/stroage/photo.png')
+			localforage.getItem('imgUrl').then(function(value) {
+				var imgData = JSON.parse(value);
+				var img = document.createElement('img');
+				img.src = imgData.url;
+				document.body.appendChild(img);
+				//console.log(imgData)
+			}).catch(function(err) {
+				//console.log(err);
+			});
+
+			//			localforage.removeItem('key').then(function() {
+			//				console.log('Key is cleared!');
+			//			}).catch(function(err) {
+			//				console.log(err);
+			//			});
+
+			//			localforage.clear().then(function() {
+			//				console.log('Database is now empty.');
+			//			}).catch(function(err) {
+			//				console.log(err);
+			//			});
+
+			//			localforage.length().then(function(numberOfKeys) {
+			//				// Outputs the length of the database.
+			//				console.log(numberOfKeys);
+			//			}).catch(function(err) {
+			//				// This code runs if there were any errors
+			//				console.log(err);
+			//			});
+
+			//			localforage.key(2).then(function(keyName) {
+			//				// Name of the key.
+			//				console.log(keyName);
+			//			}).catch(function(err) {
+			//				// This code runs if there were any errors
+			//				console.log(err);
+			//			});
+
+			//			localforage.keys().then(function(keys) {
+			//				// An array of all the key names.
+			//				console.log(keys);
+			//			}).catch(function(err) {
+			//				// This code runs if there were any errors
+			//				console.log(err);
+			//			});
+
+			//			localforage.iterate(function(value, key, iterationNumber) {
+			//				console.log([key, value]);
+			//			}).then(function() {
+			//				console.log('Iteration has completed');
+			//			}).catch(function(err) {
+			//				console.log(err);
+			//			});
+
+			//			localforage.iterate(function(value, key, iterationNumber) {
+			//				if(iterationNumber < 3) {
+			//					console.log([key, value]);
+			//				} else {
+			//					return [key, value];
+			//				}
+			//			}).then(function(result) {
+			//				console.log('Iteration has completed, last iterated pair');
+			//			}).catch(function(err) {
+			//				console.log(err);
+			//			});
+		</script>
+
+	</body>
+
+</html>

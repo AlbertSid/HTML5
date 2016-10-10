@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+
+	<body>
+		<button-hello></button-hello>
+		<button is="button-hello2">hello world</button>
+		<script type="text/javascript">
+			document.registerElement('button-hello', {
+				prototype: Object.create(HTMLButtonElement.prototype, {
+					createdCallback: {
+						value: function createdCallback() {
+							this.innerHTML = '<button>hello world</button>'
+							this.addEventListener('click', () => {
+								alert('hello world')
+							})
+						}
+					}
+				})
+			});
+			document.registerElement('button-hello2', {
+				prototype: Object.create(HTMLButtonElement.prototype, {
+					createdCallback: {
+						value: function createdCallback() {
+							this.addEventListener('click', () => {
+								alert('hello world2')
+							})
+						}
+					}
+				}),
+				extends: 'button'
+			});
+		</script>
+	</body>
+
+</html>

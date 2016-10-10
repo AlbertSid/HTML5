@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>Cookies+UserData</title>
+	</head>
+
+	<body>
+		<!--<script src="cookies.js"></script>-->
+		<script type="text/javascript">
+			console.group('JS API')
+			console.log('encodeURIComponent', encodeURIComponent('I TATTOO'))
+			console.log('decodeURIComponent', decodeURIComponent(encodeURIComponent('I TATTOO')))
+
+			console.log('encodeURI', encodeURI('I TATTOO'))
+			console.log('decodeURI', decodeURI(encodeURI('I TATTOO')))
+
+			console.log('escape', escape('I TATTOO'))
+			console.log('unescape', unescape(escape('I TATTOO')))
+			console.groupEnd()
+
+			var Cookies = function() {
+				this.defaults = {
+					//expires: 'number',过期时间
+					//path: 'string',路径
+					//domain: 'boolean',（HTTP）是否能在浏览器修改
+					//secure: 'boolean' 安全值
+				};
+				this.extend = function() {
+					var i = 0;
+					var result = {};
+					for(; i < arguments.length; i++) {
+						var attrs = arguments[i];
+						for(var key in attrs) {
+							result[key] = attrs[key];
+						}
+					}
+					return result;
+				};
+				this.keys = function() {
+					if(!document.cookie) {
+						return null;
+					}
+					var arr = document.cookie.split(';');
+					var k = [];
+					for(var i = 0, len = arr.length; i < len; i++) {
+						k.push(arr[i].trim().split('=')[0])
+					}
+					return k.sort();
+				};
+				this.values = function() {
+					if(!document.cookie) {
+						return null;
+					}
+					var arr = document.cookie.split(';');
+					var k = [];
+					for(var i = 0, len = arr.length; i < len; i++) {
+						k.push(arr[i].trim().split('=')[1])
+					}
+					return k.sort();
+				};
+			}
+			Cookies.prototype = {
+				constructor: Cookies,
+				setItem: function(key, value, options) { //设置Cookies
+					var that = new(this.constructor)();
+					var options = that.extend({
+						path: '/'
+					}, that.defaults, options);
+					//time
+					if(typeof options.expires === 'number') {
+						var exp = new Date();
+						exp.setMilliseconds(exp.getMilliseconds() + options.expires * 864e+5);
+						options.expires = exp;
+					}
+					//value
+					try {
+						result = JSON.stringify(value);
+						if(/^[\{\[]/.test(result)) {
+							value = result;
+						}
+					} catch(e) {
+						//console.error(e)
+					}
+					//key
+					key = encodeURIComponent(String(key));
+					key = key.replace(/%(23|24|26|2B|5E|60|7C)/g, decodeURIComponent);
+					key = key.replace(/[\(\)]/g, escape);
+					//all
+					document.cookie = [
+						key, '=', escape(value),
+						options.expires ? '; expires=' + options.expires.toGMTString() : '',
+						options.path ? '; path=' + options.path : '',
+						options.domain ? '; domain=' + options.domain : '',
+						options.secure ? '; secure' : ''
+					].join('')
+				},
+				getItem: function(key) { //取key的值
+					if(!document.cookie) {
+						return null;
+					}
+					key = encodeURIComponent(String(key));
+					key = key.replace(/%(23|24|26|2B|5E|60|7C)/g, decodeURIComponent);
+					key = key.replace(/[\(\)]/g, escape);
+					var arr = document.cookie.match(new RegExp("(^| )" + key + "=([^;]*)(;|$)"));
+					if(arr != null) {
+						return unescape(arr[2]);
+					} else {
+						console.error(key + ' is undefined')
+					}
+				},
+				removeItem: function(key, options) { //移除记录
+					var that = new(this.constructor)();
+					this.setItem(key, '', that.extend(options, {
+						expires: -1
+					}));
+				},
+				key: function(number) { //取第number个所对应的key
+					if(!document.cookie) {
+						return null;
+					}
+					var that = new(this.constructor)();
+					return that.keys()[number];
+//					var arra = document.cookie.replace(/\s*\=(?:.(?!;))*$/, "").split(/\s*\=(?:[^;](?!;))*[^;]?;\s*/).sort();
+//					var key = window.unescape(arra[number]);
+//					return key === "" ? null : key;
+				},
+				clear: function() { //清除记录
+					var that = new(this.constructor)();
+					var arr = document.cookie.split(';');
+					for(var i = 0, len = arr.length; i < len; i++) {
+						var key = arr[i].trim().split('=')[0];
+						this.setItem(key, '', that.extend({
+							expires: -1
+						}));
+					}
+				}
+			};
+			Cookies = Cookies.prototype;
+
+			console.log('Cookies', Cookies);
+			Cookies.setItem('aa', {
+				dsfadsf: 123
+			});
+			Cookies.setItem('aea', {
+				adsf: '1w23'
+			});
+			Cookies.setItem('ae234a', ['e', 1, 54]);
+			Cookies.setItem('12', 'function(){}');
+			console.log(Cookies.key(2));
+			//Cookies.removeItem('aa')
+			//Cookies.clear()
+		</script>
+		<script>
+			var UserData = function() {
+				this.userData = null;
+				/*{
+				 
+				 }*/
+				this.name = location.hostname;
+			};
+			UserData.prototype = {
+				constructor: UserData,
+				init: function() {
+					var that = new(this.constructor)();
+					if(!that.userData) {
+						try {
+							that.userData = document.createElement('input');
+							that.userData.type = 'hidden';
+							that.userData.style.display = 'none';
+							that.userData.addBehavior('#default#userData');
+							document.body.appendChild(that.userData);
+							var expires = new Date();
+							expires.setDate(expires.getDate() + 365);
+							that.userData.expires = expires.toUTCString();
+						} catch(e) {
+							return false;
+						}
+					}
+					return true;
+				},
+				setItem: function(key, value) {
+					var that = new(this.constructor)();
+					if(this.init()) {
+						that.userData.load(that.name);
+						that.userData.setAttribute(key, value);
+						that.userData.save(that.name);
+					}
+				},
+				getItem: function(key) {
+					var that = new(this.constructor)();
+					if(this.init()) {
+						that.userData.load(that.name);
+						return that.userData.getAttribute(key)
+					}
+				},
+				removeItem: function(key) {
+					var that = new(this.constructor)();
+					if(this.init()) {
+						that.userData.load(that.name);
+						that.userData.removeAttribute(key);
+						that.userData.save(that.name);
+					}
+				},
+				key: function(number) {
+
+				},
+				clear: function() { //清除记录
+
+				}
+			};
+			UserData = UserData.prototype;
+			console.log('UserData', UserData);
+		</script>
+	</body>
+
+</html>
